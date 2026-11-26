@@ -1,36 +1,65 @@
-# Generated data: raw cache, DuckDB, Parquet, models, reports, exports
+# Generated data: raw response cache, DuckDB, Parquet, models, reports, exports.
+# Only labels/ and schemas/ are committed.
 data/
+*.duckdb
+*.duckdb.wal
+*.parquet
+*.joblib
 
 # Secrets and local environment
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+secrets/
 
 # Python
 .venv/
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
+.hypothesis/
 .ruff_cache/
 .mypy_cache/
-.coverage
-coverage.xml
+.pyright/
+.tox/
+.nox/
 htmlcov/
+.coverage
+.coverage.*
+coverage.xml
 dist/
 build/
-*.egg-info/
+site/
+*.spec
 
 # Node
 node_modules/
 web/dist/
 web/coverage/
+web/.vite/
 web/test-results/
 web/playwright-report/
 web/blob-report/
-*storybook.log
+web/.lighthouseci/
+web/lhci-results/
+web/public/data/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # Editors and OS
 .vscode/
 .idea/
+*.swp
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Local logs and temporary files
+*.log
+logs/
+tmp/
+.cache/
