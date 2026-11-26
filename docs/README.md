@@ -5,6 +5,7 @@
 - `architecture.md`: pipeline and site design.
 - `methods.md`: detector and classifier evaluation, limitations.
 - `runbook.md`: daily run, backfill, labeling, deploy, scheduling.
+- `labeling.md`: what each class means and how to label safely.
 - `data-contract.md`: exported files and schema versions.
 - `../README.md`: project overview and quickstart.
 

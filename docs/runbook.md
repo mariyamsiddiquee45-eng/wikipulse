@@ -76,7 +76,8 @@ The preview is at http://localhost:8080. Image sizes are printed by the CI docke
 
 ## Labels and classifier
 
-Review spikes in the terminal, one at a time, with a sparkline, features and the article URL:
+Review spikes in the terminal, one at a time, with a sparkline, features and the article URL.
+The class definitions and session rules are in `docs/labeling.md`.
 
 ```sh
 uv run --project pipeline wikipulse label --count 20 --labeler your-name
