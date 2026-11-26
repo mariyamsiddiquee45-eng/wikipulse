@@ -1,0 +1,36 @@
+# Generated data: raw cache, DuckDB, Parquet, models, reports, exports
+data/
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+web/dist/
+web/coverage/
+web/test-results/
+web/playwright-report/
+web/blob-report/
+*storybook.log
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
