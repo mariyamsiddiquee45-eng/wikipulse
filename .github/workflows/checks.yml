@@ -94,3 +94,13 @@ jobs:
       - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: docker build -f docker/pipeline.Dockerfile -t wikipulse-pipeline:ci .
+      - run: docker build -f docker/web.Dockerfile -t wikipulse-web:ci .
+      - run: docker image inspect wikipulse-pipeline:ci --format 'pipeline image bytes: {{.Size}}'
+      - run: docker image inspect wikipulse-web:ci --format 'web image bytes: {{.Size}}'
