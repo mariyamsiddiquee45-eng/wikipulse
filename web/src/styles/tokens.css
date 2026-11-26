@@ -1,0 +1,94 @@
+:root {
+  color-scheme: light;
+  --wp-bg: #f8f9fa;
+  --wp-surface: #ffffff;
+  --wp-surface-muted: #f1f3f5;
+  --wp-text: #202122;
+  --wp-muted: #54595d;
+  --wp-border: #a2a9b1;
+  --wp-border-subtle: #c8ccd1;
+  --wp-link: #3366cc;
+  --wp-link-visited: #6b4ba1;
+  --wp-accent: #3366cc;
+  --wp-focus: #3366cc;
+  --wp-danger: #b32424;
+  --wp-warning-bg: #fef6e7;
+  --wp-warning-border: #edab00;
+  --wp-header: #ffffff;
+  --wp-code: #f1f3f5;
+  --wp-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+  --bubble-label: #ffffff;
+  --type-flash-fg: #92400e;
+  --type-flash-bg: #fef3c7;
+  --type-slow-fg: #1e40af;
+  --type-slow-bg: #dbeafe;
+  --type-recurring-fg: #5b21b6;
+  --type-recurring-bg: #ede9fe;
+  --type-always-fg: #166534;
+  --type-always-bg: #dcfce7;
+  --font-serif: Georgia, 'Linux Libertine', 'Times New Roman', serif;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --radius: 2px;
+  --content-width: 1120px;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --wp-bg: #101418;
+  --wp-surface: #161b22;
+  --wp-surface-muted: #1f2630;
+  --wp-text: #eaecf0;
+  --wp-muted: #a2a9b1;
+  --wp-border: #54595d;
+  --wp-border-subtle: #3b434c;
+  --wp-link: #8ab4f8;
+  --wp-link-visited: #c5a3ff;
+  --wp-accent: #8ab4f8;
+  --wp-focus: #8ab4f8;
+  --wp-danger: #ff8a8a;
+  --wp-warning-bg: #2b2413;
+  --wp-warning-border: #b8860b;
+  --wp-header: #161b22;
+  --wp-code: #1f2630;
+  --wp-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+  --bubble-label: #101418;
+  --type-flash-fg: #fcd34d;
+  --type-flash-bg: #3a2a08;
+  --type-slow-fg: #93c5fd;
+  --type-slow-bg: #10243f;
+  --type-recurring-fg: #c4b5fd;
+  --type-recurring-bg: #241a44;
+  --type-always-fg: #86efac;
+  --type-always-bg: #0f2b19;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --wp-bg: #101418;
+    --wp-surface: #161b22;
+    --wp-surface-muted: #1f2630;
+    --wp-text: #eaecf0;
+    --wp-muted: #a2a9b1;
+    --wp-border: #54595d;
+    --wp-border-subtle: #3b434c;
+    --wp-link: #8ab4f8;
+    --wp-link-visited: #c5a3ff;
+    --wp-accent: #8ab4f8;
+    --wp-focus: #8ab4f8;
+    --wp-danger: #ff8a8a;
+    --wp-warning-bg: #2b2413;
+    --wp-warning-border: #b8860b;
+    --wp-header: #161b22;
+    --wp-code: #1f2630;
+    --wp-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+    --type-flash-fg: #fcd34d;
+    --type-flash-bg: #3a2a08;
+    --type-slow-fg: #93c5fd;
+    --type-slow-bg: #10243f;
+    --type-recurring-fg: #c4b5fd;
+    --type-recurring-bg: #241a44;
+    --type-always-fg: #86efac;
+    --type-always-bg: #0f2b19;
+  }
+}

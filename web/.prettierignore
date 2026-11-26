@@ -2,3 +2,9 @@ dist/
 coverage/
 node_modules/
 package-lock.json
+public/data/
+public/sitemap.xml
+public/robots.txt
+src/types/generated.ts
+playwright-report/
+test-results/

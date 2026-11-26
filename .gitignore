@@ -1,6 +1,7 @@
 # Generated data: raw response cache, DuckDB, Parquet, models, reports, exports.
-# Only labels/ and schemas/ are committed.
-data/
+# Only labels/ and schemas/ are committed. The leading slash keeps source
+# directories such as web/src/data/ trackable.
+/data/
 *.duckdb
 *.duckdb.wal
 *.parquet
