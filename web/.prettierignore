@@ -8,3 +8,6 @@ public/robots.txt
 src/types/generated.ts
 playwright-report/
 test-results/
+.lighthouseci/
+lhci-results/
+test-fixtures/

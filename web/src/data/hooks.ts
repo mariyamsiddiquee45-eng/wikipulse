@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { bootstrapData } from './bootstrap'
 import {
   getArticle,
   getDay,
@@ -23,9 +24,12 @@ export type Resource<T> =
 export function useResource<T>(
   key: string,
   load: (signal: AbortSignal) => Promise<T>,
+  initial?: T,
 ): Resource<T> {
   const [attempt, setAttempt] = useState(0)
-  const [state, setState] = useState<Internal<T>>({ key, status: 'loading' })
+  const [state, setState] = useState<Internal<T>>(
+    initial === undefined ? { key, status: 'loading' } : { key, status: 'ready', data: initial },
+  )
 
   useEffect(() => {
     const controller = new AbortController()
@@ -58,12 +62,15 @@ export function useResource<T>(
 }
 
 export function useManifest(): Resource<Manifest> {
-  return useResource('manifest', getManifest)
+  const bootstrap = bootstrapData()
+  return useResource('manifest', getManifest, bootstrap?.manifest ?? undefined)
 }
 
 export function useDay(day: string): Resource<Day> {
   const load = useCallback((signal: AbortSignal) => getDay(day, signal), [day])
-  return useResource(`day:${day}`, load)
+  const bootstrap = bootstrapData()
+  const initial = bootstrap?.latestDay?.day === day ? bootstrap.latestDay : undefined
+  return useResource(`day:${day}`, load, initial)
 }
 
 export function useArticle(slug: string): Resource<Article> {

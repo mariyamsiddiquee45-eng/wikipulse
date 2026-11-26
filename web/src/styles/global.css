@@ -275,11 +275,11 @@ a:visited {
 .button.primary {
   background: var(--wp-accent);
   border-color: var(--wp-accent);
-  color: #fff;
+  color: var(--wp-accent-contrast);
 }
 
 .button.primary:visited {
-  color: #fff;
+  color: var(--wp-accent-contrast);
 }
 
 .button.primary:hover {

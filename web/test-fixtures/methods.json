@@ -1,0 +1,1 @@
+{"schema_version":1,"generated_at":"2026-11-25T00:00:00Z","labels":0,"classes":[],"detector":{"z_threshold":3,"minimum_views":1000},"classifier":null,"limitations":["Human labels: 0 of the 300 target.","Edit-surge data publishes about two months late, so recent spikes lack it."]}
