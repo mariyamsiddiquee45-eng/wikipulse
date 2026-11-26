@@ -1,0 +1,45 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.6
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        files: ^pipeline/
+      - id: ruff-format
+        files: ^pipeline/
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run --directory pipeline mypy
+        language: system
+        files: ^pipeline/.*\.py$
+        pass_filenames: false
+
+      - id: eslint
+        name: eslint
+        entry: npm --prefix web run lint
+        language: system
+        files: ^web/.*\.(ts|tsx|js)$
+        pass_filenames: false
+
+      - id: prettier
+        name: prettier
+        entry: npm --prefix web run format:check
+        language: system
+        files: ^web/
+        pass_filenames: false
+
+      - id: gitleaks
+        name: gitleaks
+        entry: gitleaks git --pre-commit --staged --redact
+        language: system
+        pass_filenames: false
+
+      - id: commitlint
+        name: commitlint
+        entry: npm --prefix web exec -- commitlint --config web/commitlint.config.js --edit
+        language: system
+        stages: [commit-msg]
+        pass_filenames: true
