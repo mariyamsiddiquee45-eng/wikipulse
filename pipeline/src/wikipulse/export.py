@@ -253,13 +253,24 @@ def _day_document(
                 "type": str(event_type),
                 "members": members,
                 "extract": {
-                    "text": (extract[:EXTRACT_CHARS] if isinstance(extract, str) else None),
+                    "text": _short_extract(extract) if isinstance(extract, str) else None,
                     "url": info["url"],
                     "license": "CC BY-SA 4.0",
                 },
             }
         )
     return {"schema_version": SCHEMA_VERSION, "day": day.isoformat(), "events": documents}
+
+
+def _short_extract(text: str) -> str:
+    """Cut an extract at a sentence boundary so it never stops mid-word."""
+    if len(text) <= EXTRACT_CHARS:
+        return text
+    window = text[:EXTRACT_CHARS]
+    boundary = max(window.rfind(". "), window.rfind("! "), window.rfind("? "))
+    if boundary >= EXTRACT_CHARS // 2:
+        return window[: boundary + 1]
+    return window.rstrip() + "…"
 
 
 def _spike_map(
