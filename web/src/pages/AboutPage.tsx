@@ -10,9 +10,8 @@ export function AboutPage() {
     <article className="prose stack">
       <h1>About WikiPulse</h1>
       <p>
-        WikiPulse shows what people suddenly became curious about on English Wikipedia. Once a day,
-        the pipeline finds unusual pageview jumps, groups the articles that belong to the same
-        event, and publishes the result as static files.
+        WikiPulse shows daily jumps in English Wikipedia pageviews, grouped into events. Once a day,
+        it publishes the result as static files.
       </p>
 
       <h2>Data</h2>

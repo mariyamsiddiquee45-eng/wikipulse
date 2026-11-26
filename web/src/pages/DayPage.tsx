@@ -35,7 +35,7 @@ export function DayPage() {
         <EmptyState title={`No data file for ${formatDate(date)}`}>
           <p>
             This day was not exported. It may be missing from the source data or outside the
-            archive.
+            published range.
           </p>
           <Link className="button" to="/">
             Go to the latest day

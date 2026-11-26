@@ -34,8 +34,8 @@ export function MethodsPage() {
       <header>
         <h1>Methods</h1>
         <p className="muted">
-          Updated {formatDate(data.generated_at.slice(0, 10))}. This page reports the same data the
-          pipeline exported; it is not a marketing summary.
+          Updated {formatDate(data.generated_at.slice(0, 10))}. These are the current detection
+          settings and evaluation results.
         </p>
       </header>
 
@@ -110,9 +110,9 @@ export function MethodsPage() {
         ) : (
           <div className="notice">
             <p>
-              No classifier is trained yet. Human labeling is the gate, and the rule-based score is
-              what the site shows. There are <strong>{data.labels}</strong> labels; the target is
-              300 before training.
+              No classifier is trained yet. Labels are added by hand before training, and the
+              rule-based score is what the site shows. There are <strong>{data.labels}</strong>{' '}
+              labels. {300 - data.labels > 0 ? `${300 - data.labels} more are needed.` : ''}
             </p>
           </div>
         )}
@@ -123,7 +123,7 @@ export function MethodsPage() {
         <p>
           {data.labels} labels are available across classes:{' '}
           {data.classes.length ? data.classes.join(', ') : 'none yet'}. The target is at least 300
-          labels covering all classes, sampled across the archive.
+          labels covering all classes, sampled across the available days.
         </p>
       </section>
 

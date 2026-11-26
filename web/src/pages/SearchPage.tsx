@@ -100,7 +100,8 @@ export function SearchPage() {
       <header>
         <h1>Search articles</h1>
         <p className="muted">
-          The index covers articles that spiked in the archive. Enter at least two characters.
+          The index covers articles with a pageview jump in the available days. Enter at least two
+          characters.
         </p>
       </header>
       <SearchForm initial={query} />

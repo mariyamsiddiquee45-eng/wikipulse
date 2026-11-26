@@ -4,9 +4,7 @@ import { expect, test } from '@playwright/test'
 test.describe('public pages', () => {
   test('home shows the latest day, ranked list and bubbles', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(
-      'What people suddenly looked up',
-    )
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('biggest pageview jumps')
     await expect(page.getByRole('region', { name: /Events on/ })).toBeVisible()
     await expect(page.locator('.event-item').first()).toBeVisible()
     await expect(page.locator('.bubble-svg')).toBeVisible()
@@ -21,7 +19,7 @@ test.describe('public pages', () => {
     await page.locator('.event-item').first().getByRole('link').click()
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await expect(page.getByText('Text from')).toBeVisible()
-    await page.getByRole('link', { name: 'History' }).first().click()
+    await page.getByRole('link', { name: 'View history' }).first().click()
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await expect(page.locator('svg.chart')).toBeVisible()
     await expect(page.getByText('Spike days')).toBeVisible()

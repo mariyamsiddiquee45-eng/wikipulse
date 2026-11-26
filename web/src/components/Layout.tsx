@@ -75,7 +75,7 @@ export function Layout() {
       <footer className="footer">
         <div className="container footer-grid">
           <div>
-            <p>WikiPulse shows what people suddenly became curious about on English Wikipedia.</p>
+            <p>WikiPulse shows daily pageview jumps on English Wikipedia, grouped into events.</p>
             <p>
               Pageview and edit data from Wikimedia (CC0). Article text CC BY-SA 4.0, linked to its
               source.

@@ -66,7 +66,7 @@ export function EventPage() {
         <div className="row">
           <span className={`badge ${typeClass(event.type)}`}>{event.type}</span>
           <span className="muted small">
-            Score {formatNumber(Math.round(event.score))} · {event.members.length}{' '}
+            Spike score {formatNumber(Math.round(event.score))} · {event.members.length}{' '}
             {event.members.length === 1 ? 'article' : 'articles'}
           </span>
         </div>
@@ -102,15 +102,17 @@ export function EventPage() {
                       ? 'unknown'
                       : formatNumber(Math.round(member.baseline))}
                   </span>
-                  <span>z {member.z_score === null ? 'unknown' : member.z_score.toFixed(1)}</span>
+                  <span>
+                    z-score {member.z_score === null ? 'unknown' : member.z_score.toFixed(1)}
+                  </span>
                   <span className={`badge ${typeClass(member.type)}`}>{member.type}</span>
                   {member.class_probability === null ? null : (
-                    <span>event chance {Math.round(member.class_probability * 100)}%</span>
+                    <span>event likelihood {Math.round(member.class_probability * 100)}%</span>
                   )}
                 </div>
               </div>
               <Link className="button" to={articlePath(member.slug)}>
-                History
+                View history
               </Link>
             </li>
           ))}

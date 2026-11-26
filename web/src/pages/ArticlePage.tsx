@@ -77,8 +77,8 @@ export function ArticlePage() {
             {article.spikes.map((spike) => (
               <li key={spike.day}>
                 <Link to={dayPath(spike.day)}>{formatDate(spike.day)}</Link> ·{' '}
-                <span className={`badge ${typeClass(spike.type)}`}>{spike.type}</span> · z{' '}
-                {spike.z_score === null ? 'unknown' : spike.z_score.toFixed(1)} · score{' '}
+                <span className={`badge ${typeClass(spike.type)}`}>{spike.type}</span> · z-score{' '}
+                {spike.z_score === null ? 'unknown' : spike.z_score.toFixed(1)} · spike score{' '}
                 {formatNumber(Math.round(spike.score))}
               </li>
             ))}

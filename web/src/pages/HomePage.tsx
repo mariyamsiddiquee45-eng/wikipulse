@@ -13,8 +13,8 @@ function LatestDay({ manifest }: { manifest: Manifest }) {
   const day = useDay(manifest.last_day ?? '')
   if (!manifest.last_day) {
     return (
-      <EmptyState title="No days are published yet">
-        <p>The pipeline has not exported a complete day. Run the daily pipeline first.</p>
+      <EmptyState title="No complete day is available">
+        <p>The export does not contain a complete day yet.</p>
       </EmptyState>
     )
   }
@@ -41,10 +41,10 @@ function DayContent({ day, manifest }: { day: Day; manifest: Manifest }) {
           <p className="small muted">
             Data through {formatDate(manifest.data_through ?? day.day)} · English Wikipedia
           </p>
-          <h1>What people suddenly looked up.</h1>
+          <h1>The day's biggest pageview jumps on Wikipedia.</h1>
           <p>
-            Daily pageview spikes on English Wikipedia, grouped into the events behind them. The
-            ranked list is the full record; the bubble pack is a second view of the same day.
+            Daily pageviews on English Wikipedia, grouped into the events behind them. Each event
+            collects the articles that rose together.
           </p>
           <div className="hero-actions">
             <a className="button primary" href="#events">
@@ -75,8 +75,8 @@ function DayContent({ day, manifest }: { day: Day; manifest: Manifest }) {
         </section>
 
         <aside className="card bubble-panel" aria-labelledby="bubbles-heading">
-          <h2 id="bubbles-heading">The day at a glance</h2>
-          <p className="muted small">Circle size is spike score; color is spike type.</p>
+          <h2 id="bubbles-heading">Events by score</h2>
+          <p className="muted small">Circle size is spike score. Color is spike type.</p>
           {day.events.length ? (
             <BubblePack events={day.events} />
           ) : (
@@ -93,7 +93,7 @@ export function HomePage() {
   usePageMeta({
     title: 'WikiPulse - what people looked up on Wikipedia today',
     description:
-      'Daily spikes in English Wikipedia pageviews, grouped into real-world events. Updated once a day.',
+      'Daily pageview jumps in English Wikipedia, grouped into events. Updated once a day.',
   })
   const manifest = useManifest()
   if (manifest.status === 'loading') return <LoadingBlock lines={8} />
