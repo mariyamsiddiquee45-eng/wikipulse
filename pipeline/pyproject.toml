@@ -5,12 +5,14 @@ description = "Daily spikes on English Wikipedia, grouped into events."
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "duckdb>=1.1",
+  "numpy>=2.0",
   "pandas>=2.2",
   "pandera>=0.21",
   "pydantic>=2.9",
   "pydantic-settings>=2.6",
   "pyarrow>=18.0",
   "requests>=2.32",
+  "statsmodels>=0.14",
   "typer>=0.15",
 ]
 
@@ -19,6 +21,7 @@ wikipulse = "wikipulse.cli:app"
 
 [dependency-groups]
 dev = [
+  "hypothesis>=6.100",
   "mypy>=1.15",
   "pandas-stubs>=2.2",
   "pip-audit>=2.9",
@@ -55,3 +58,8 @@ warn_unreachable = true
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers --strict-config"
 testpaths = ["tests"]
+markers = ["slow: long-running performance and volume tests"]
+
+[[tool.mypy.overrides]]
+module = ["statsmodels.*"]
+ignore_missing_imports = true

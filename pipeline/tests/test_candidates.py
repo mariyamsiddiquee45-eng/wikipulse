@@ -41,21 +41,15 @@ def _seed(connection: duckdb.DuckDBPyConnection) -> date:
         ],
     )
     connection.execute(
-        "INSERT INTO spikes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        """
+        INSERT INTO spikes (spike_id, day, article, views, score, spike_type, features, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
         [
             "spike-1",
             date(2024, 1, 30),
             "Alpha",
             1000,
-            100.0,
-            5.0,
-            3.0,
-            1.0,
-            1.0,
-            1.0,
-            0,
-            0,
-            False,
             10.0,
             "Flash",
             "{}",

@@ -92,3 +92,26 @@ class Summary(BaseModel):
     pageid: int | None = None
     wikibase_item: str | None = None
     content_urls: ContentUrls | None = None
+
+
+class SpikeRecord(BaseModel):
+    """One detected spike, ready to upsert into the spikes table."""
+
+    spike_id: str
+    day: date
+    article: str
+    views: int
+    baseline: float | None
+    z_score: float | None
+    peak_ratio: float | None
+    rise_days: float | None
+    time_to_peak_days: float | None
+    half_life_days: float | None
+    yoy_ratio: float | None
+    rank_jump: int | None
+    days_since_last_spike: int | None
+    edit_surge: bool
+    stl_residual: float | None
+    score: float
+    spike_type: str
+    features: dict[str, float | int | str | bool | None]

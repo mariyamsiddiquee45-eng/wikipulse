@@ -10,7 +10,7 @@ from typing import Any
 import duckdb
 
 from wikipulse.config import Settings
-from wikipulse.models import ArticleDailyItem, EditedPage, Summary, TopArticle
+from wikipulse.models import ArticleDailyItem, EditedPage, SpikeRecord, Summary, TopArticle
 
 _TABLES = (
     "top_daily",
@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS spikes (
     rank_jump INTEGER,
     days_since_last_spike INTEGER,
     edit_surge BOOLEAN NOT NULL DEFAULT FALSE,
+    stl_residual DOUBLE,
+    time_to_peak_days DOUBLE,
     score DOUBLE NOT NULL,
     spike_type VARCHAR NOT NULL,
     features VARCHAR NOT NULL,
@@ -116,8 +118,10 @@ def connect(settings: Settings) -> duckdb.DuckDBPyConnection:
 
 
 def init_schema(connection: duckdb.DuckDBPyConnection) -> None:
-    """Create every table if it does not exist."""
+    """Create every table if it does not exist, then add later columns."""
     connection.execute(_SCHEMA)
+    connection.execute("ALTER TABLE spikes ADD COLUMN IF NOT EXISTS stl_residual DOUBLE")
+    connection.execute("ALTER TABLE spikes ADD COLUMN IF NOT EXISTS time_to_peak_days DOUBLE")
 
 
 def upsert_top(
@@ -164,6 +168,60 @@ def upsert_meta(connection: duckdb.DuckDBPyConnection, article: str, summary: Su
         "INSERT OR REPLACE INTO article_meta VALUES (?, ?, ?, ?, ?, ?)",
         [article, summary.title, summary.description, summary.extract, url, utc_now()],
     )
+
+
+def upsert_spikes(connection: duckdb.DuckDBPyConnection, records: Iterable[SpikeRecord]) -> int:
+    """Insert or replace detected spikes by spike_id."""
+    rows = [
+        (
+            record.spike_id,
+            record.day,
+            record.article,
+            record.views,
+            record.baseline,
+            record.z_score,
+            record.peak_ratio,
+            record.rise_days,
+            record.time_to_peak_days,
+            record.half_life_days,
+            record.yoy_ratio,
+            record.rank_jump,
+            record.days_since_last_spike,
+            record.edit_surge,
+            record.stl_residual,
+            record.score,
+            record.spike_type,
+            json.dumps(record.features, sort_keys=True, separators=(",", ":")),
+            utc_now(),
+        )
+        for record in records
+    ]
+    if rows:
+        connection.executemany(
+            """
+            INSERT OR REPLACE INTO spikes (
+                spike_id, day, article, views, baseline, z_score, peak_ratio,
+                rise_days, time_to_peak_days, half_life_days, yoy_ratio, rank_jump,
+                days_since_last_spike, edit_surge, stl_residual, score, spike_type,
+                features, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            rows,
+        )
+    return len(rows)
+
+
+def last_spike_day(
+    connection: duckdb.DuckDBPyConnection, article: str, before: date
+) -> date | None:
+    """Return the most recent earlier spike day for an article."""
+    row = connection.execute(
+        "SELECT max(day) FROM spikes WHERE article = ? AND day < ?", [article, before]
+    ).fetchone()
+    if row is None or row[0] is None:
+        return None
+    value = row[0]
+    return value if isinstance(value, date) else None
 
 
 def mark_day(
