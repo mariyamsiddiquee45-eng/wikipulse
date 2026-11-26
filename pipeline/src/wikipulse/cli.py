@@ -15,10 +15,12 @@ from wikipulse.client import WikimediaClient
 from wikipulse.config import Settings
 from wikipulse.embeddings import SentenceTransformerEmbedder, ensure_summaries
 from wikipulse.events import cluster_range
+from wikipulse.export import ExportError, export_all
 from wikipulse.features import FeatureSet, collect_features, detect_range, features_frame
 from wikipulse.history import fetch_candidate_history
 from wikipulse.ingest import backfill, last_complete_day
 from wikipulse.labels import load_labels, run_label_session, sample_spikes
+from wikipulse.run_daily import run_daily
 
 app = typer.Typer(help="WikiPulse data pipeline.", no_args_is_help=True)
 
@@ -326,3 +328,60 @@ def cluster(
         f"Summaries {fetched} fetched, {failed} missing; {len(articles)} spikes; "
         f"{len(events)} events."
     )
+
+
+@app.command()
+def export(
+    start: Annotated[str | None, typer.Option(help="First day, YYYY-MM-DD.")] = None,
+    end: Annotated[str | None, typer.Option(help="Last day, YYYY-MM-DD.")] = None,
+) -> None:
+    """Validate and publish the static JSON export."""
+    _configure_logging()
+    settings = Settings()
+    connection = db.connect(settings)
+    try:
+        summary = export_all(
+            settings,
+            connection,
+            start=_parse_day(start) if start else None,
+            end=_parse_day(end) if end else None,
+        )
+    except ExportError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(
+        f"Exported {summary.days} days, {summary.events} events, "
+        f"{summary.articles} articles, {summary.search_shards} search shards, "
+        f"{summary.files} files to {summary.output_dir}."
+    )
+    for warning in summary.warnings:
+        typer.echo(f"warning: {warning}")
+
+
+@app.command("run-daily")
+def run_daily_command(
+    ingest_days: Annotated[int, typer.Option(help="Days to check for missing ingestion.")] = 7,
+    window_days: Annotated[int, typer.Option(help="Days to detect, cluster and export.")] = 3,
+) -> None:
+    """Run the complete incremental pipeline and write status.json."""
+    _configure_logging()
+    settings = Settings()
+    try:
+        summary = run_daily(settings, ingest_days=ingest_days, window_days=window_days)
+    except Exception as exc:
+        typer.echo(f"Daily run failed: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(
+        f"Daily run through {summary.data_through}: {summary.ingested_days} days, "
+        f"{summary.candidates} candidates, {summary.spikes} spikes, "
+        f"{summary.events} events, {summary.articles} articles."
+    )
+    if summary.export is not None:
+        typer.echo(
+            f"Exported {summary.export.files} files to {summary.export.output_dir}; "
+            f"warnings {len(summary.export.warnings)}."
+        )
+    if summary.failures:
+        for failure in summary.failures:
+            typer.echo(failure, err=True)
+        raise typer.Exit(code=1)

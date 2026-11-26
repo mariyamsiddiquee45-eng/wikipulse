@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wikipulse.local/schemas/status.schema.json",
+  "title": "WikiPulse status",
+  "type": "object",
+  "required": ["schema_version", "last_run", "ok", "warnings", "data_through"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "last_run": { "type": ["string", "null"] },
+    "ok": { "type": "boolean" },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "data_through": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wikipulse.local/schemas/methods.schema.json",
+  "title": "WikiPulse methods",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "labels",
+    "classes",
+    "detector",
+    "classifier",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at": { "type": "string" },
+    "labels": { "type": "integer", "minimum": 0 },
+    "classes": { "type": "array", "items": { "type": "string" } },
+    "detector": {
+      "type": "object",
+      "required": ["z_threshold", "minimum_views"],
+      "properties": {
+        "z_threshold": { "type": "number" },
+        "minimum_views": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "classifier": {
+      "type": ["object", "null"],
+      "required": ["model", "event_f1", "macro_f1", "brier", "labels", "generated_at"],
+      "properties": {
+        "model": { "type": "string" },
+        "event_f1": { "type": "number" },
+        "macro_f1": { "type": "number" },
+        "brier": { "type": "number" },
+        "labels": { "type": "integer" },
+        "generated_at": { "type": "string" },
+        "baselines": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
