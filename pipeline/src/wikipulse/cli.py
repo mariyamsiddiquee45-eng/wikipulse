@@ -13,6 +13,8 @@ from wikipulse.candidates import select_candidates
 from wikipulse.classifier import ClassifierError, classify_spikes, train_classifier
 from wikipulse.client import WikimediaClient
 from wikipulse.config import Settings
+from wikipulse.embeddings import SentenceTransformerEmbedder, ensure_summaries
+from wikipulse.events import cluster_range
 from wikipulse.features import FeatureSet, collect_features, detect_range, features_frame
 from wikipulse.history import fetch_candidate_history
 from wikipulse.ingest import backfill, last_complete_day
@@ -281,3 +283,46 @@ def classify(
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=1) from exc
     typer.echo(f"Scored {scored} spikes.")
+
+
+@app.command()
+def cluster(
+    start: Annotated[str | None, typer.Option(help="First day, YYYY-MM-DD.")] = None,
+    end: Annotated[str | None, typer.Option(help="Last day, YYYY-MM-DD.")] = None,
+    days: Annotated[int, typer.Option(help="Number of days ending at the last complete day.")] = 7,
+    model: Annotated[str, typer.Option(help="Sentence-transformers model name.")] = (
+        "sentence-transformers/all-MiniLM-L6-v2"
+    ),
+) -> None:
+    """Fetch summaries, embed spike articles and build daily events."""
+    _configure_logging()
+    settings = Settings()
+    begin, finish = _date_range(start, end, days)
+    client = WikimediaClient(settings)
+    connection = db.connect(settings)
+    run_id = db.start_run(connection, "cluster")
+    articles = [
+        str(row[0])
+        for row in connection.execute(
+            "SELECT DISTINCT article FROM spikes WHERE day BETWEEN ? AND ?", [begin, finish]
+        ).fetchall()
+    ]
+    fetched, failed = ensure_summaries(connection, client, articles)
+    events = cluster_range(connection, settings, begin, finish, SentenceTransformerEmbedder(model))
+    db.finish_run(
+        connection,
+        run_id,
+        ok=True,
+        counts={
+            "summaries": fetched,
+            "summary_failures": failed,
+            "events": len(events),
+            "spikes": len(articles),
+        },
+        failures=[],
+    )
+    db.write_parquet(connection, settings)
+    typer.echo(
+        f"Summaries {fetched} fetched, {failed} missing; {len(articles)} spikes; "
+        f"{len(events)} events."
+    )
