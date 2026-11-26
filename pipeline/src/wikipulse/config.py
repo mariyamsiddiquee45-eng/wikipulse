@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     candidate_window_days: int = 28
     rank_mover_delta: int = 100
     watchlist_days: int = 14
+    candidate_history_days: int = Field(default=400, ge=35)
+    max_candidates_per_day: int = Field(default=200, ge=0)
 
     @property
     def cache_dir(self) -> Path:

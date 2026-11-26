@@ -7,8 +7,10 @@ from typing import Annotated
 import typer
 
 from wikipulse import __version__, db
+from wikipulse.candidates import select_candidates
 from wikipulse.client import WikimediaClient
 from wikipulse.config import Settings
+from wikipulse.history import fetch_candidate_history
 from wikipulse.ingest import backfill, last_complete_day
 
 app = typer.Typer(help="WikiPulse data pipeline.", no_args_is_help=True)
@@ -76,6 +78,55 @@ def ingest(
         f"{len(summary.failures)} failures."
     )
     typer.echo(f"Wrote {len(paths)} Parquet files to {settings.parquet_dir}")
+    if summary.failures:
+        for failure in summary.failures:
+            typer.echo(failure, err=True)
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def history(
+    start: Annotated[str | None, typer.Option(help="First day, YYYY-MM-DD.")] = None,
+    end: Annotated[str | None, typer.Option(help="Last day, YYYY-MM-DD.")] = None,
+    days: Annotated[int, typer.Option(help="Number of days ending at the last complete day.")] = 7,
+    lookback: Annotated[
+        int | None, typer.Option(help="Days of history before each candidate day.")
+    ] = None,
+    force: Annotated[
+        bool, typer.Option(help="Refetch articles that already have a baseline.")
+    ] = False,
+) -> None:
+    """Fetch per-article history for new entrants, rank movers and recent spikes."""
+    _configure_logging()
+    settings = Settings()
+    finish = _parse_day(end) if end else last_complete_day()
+    begin = _parse_day(start) if start else finish - timedelta(days=days - 1)
+    if begin > finish:
+        raise typer.BadParameter("--start must not be after --end")
+
+    client = WikimediaClient(settings)
+    connection = db.connect(settings)
+    run_id = db.start_run(connection, "history")
+    all_candidates = []
+    current = begin
+    while current <= finish:
+        all_candidates.extend(select_candidates(connection, current, settings))
+        current += timedelta(days=1)
+    summary = fetch_candidate_history(
+        settings, client, connection, all_candidates, lookback_days=lookback, force=force
+    )
+    db.finish_run(
+        connection,
+        run_id,
+        ok=not summary.failures,
+        counts={"articles": summary.articles_fetched, "article_daily": summary.rows},
+        failures=summary.failures,
+    )
+    db.write_parquet(connection, settings)
+    typer.echo(
+        f"Candidates {summary.articles_considered}; fetched {summary.articles_fetched} "
+        f"articles; {summary.rows} rows; {len(summary.failures)} failures."
+    )
     if summary.failures:
         for failure in summary.failures:
             typer.echo(failure, err=True)
