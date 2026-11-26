@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "check": "npm run lint && npm run format:check && npm run test && npm run check:svg && npm run check:links && npm run build",
+    "check": "npm run lint && npm run format:check && npm run test && npm run check:svg && npm run build && npm run check:links",
     "generate:types": "node scripts/generate-types.mjs",
     "data": "node scripts/sync-data.mjs && node scripts/generate-bootstrap.mjs",
     "check:svg": "node scripts/check-svg.mjs",
