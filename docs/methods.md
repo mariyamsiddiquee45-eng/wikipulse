@@ -56,9 +56,11 @@ uses expanding-window time-series splits only, never random splits, and reports 
 precision, recall and F1, a confusion matrix, calibration, precision at k, a Brier score,
 permutation importance and LightGBM gain importance against baselines A to C.
 
-As of this build there are zero human labels, so no production classifier exists and the
-Methods page says so. Synthetic tests guard the training code, but synthetic numbers are not
-published as production quality.
+An initial 331-label pilot (282 event, 42 recurring, 7 noise) trained LightGBM with event
+F1 0.878, macro F1 0.329 and Brier 0.18. It does not beat baseline A (0.937) and it cannot
+recognize noise (F1 0). It is therefore not applied: `WIKIPULSE_APPLY_CLASSIFIER` stays false
+until a retrained model beats the rule baseline. More non-event labels and a broader archive
+are required.
 
 ## Events and spike types
 
@@ -75,11 +77,10 @@ highest-scoring member. Spike types use documented rules:
 
 ## Limitations
 
-- Human labels and a real classifier are still missing; only the rule detector is shipped.
+- Human labels exist but are imbalanced; the pilot classifier is not good enough to ship.
 - Edit surge is unavailable for recent days and only covers the daily top 100 edited pages.
 - Events are grouped by title and summary embeddings; there is no link-graph signal yet.
 - Single-article events are not independently confirmed as real-world events.
-- The archive is demo-sized (three days) in this repository; the pipeline supports the full
-  five-year window.
+- The local archive is a 28-day window; the pipeline supports the full five-year window.
 - Cloudflare Pages Free allows 20,000 files. The export caps article files at 12,000, so an
   article that was capped falls back to its Wikipedia source.

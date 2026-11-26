@@ -70,7 +70,7 @@ def run_daily(
 
         features, inserted = detect_range(connection, settings, window_start, end)
         summary.spikes = inserted
-        if load_model(settings) is not None:
+        if settings.apply_classifier and load_model(settings) is not None:
             classify_spikes(connection, settings, window_start, end)
 
         spike_articles = [

@@ -11,10 +11,10 @@ Not affiliated with Wikipedia or the Wikimedia Foundation.
 
 ## Status
 
-The pipeline and site are built through Phase 11. The repository ships with a three-day
-demo export produced locally; generated data is never committed. Human labeling is still
-open: there are zero labels, so the site uses the rule-based score and the Methods page
-states that no classifier is trained.
+The pipeline and site are built through Phase 11. The repository ships with a 28-day local
+export; generated data is never committed. A 331-label pilot trained a classifier, but it
+does not beat the rule baseline and is not applied. The Methods page states this. More
+non-event labels are needed.
 
 ## Layout
 

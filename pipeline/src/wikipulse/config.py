@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     candidate_history_days: int = Field(default=400, ge=35)
     max_candidates_per_day: int = Field(default=200, ge=0)
     max_article_files: int = Field(default=12000, ge=0)
+    apply_classifier: bool = False
 
     @property
     def cache_dir(self) -> Path:
