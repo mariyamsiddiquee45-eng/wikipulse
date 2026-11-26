@@ -54,6 +54,10 @@ GET https://wikimedia.org/api/rest_v1/metrics/edited-pages/top-by-edits/en.wikip
 
 - Daily granularity exists and works back to at least 2015-08-01, so the edit-surge signal
   is kept.
+- Publication lags pageviews by roughly one to two months. On 2026-11-26, 2026-10-01
+  returned data but 2026-11-01 and 2026-11-25 returned 404. A recent day's empty response
+  means "not published yet", so ingestion marks the day incomplete and retries it on later
+  runs. The edit-surge feature is unavailable for recent days rather than zero.
 - The response is the top 100 content pages only; it is not a per-article edit count.
 - There is no daily per-page edit endpoint. The per-page route
   `/metrics/edits/per-page/...` returns 404, and the documented per-page edit metrics are
