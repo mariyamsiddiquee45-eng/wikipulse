@@ -1,6 +1,7 @@
 """Typer command line entry points."""
 
 import logging
+import os
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Annotated
@@ -14,6 +15,7 @@ from wikipulse.config import Settings
 from wikipulse.features import FeatureSet, collect_features, detect_range, features_frame
 from wikipulse.history import fetch_candidate_history
 from wikipulse.ingest import backfill, last_complete_day
+from wikipulse.labels import load_labels, run_label_session, sample_spikes
 
 app = typer.Typer(help="WikiPulse data pipeline.", no_args_is_help=True)
 
@@ -189,3 +191,46 @@ def detect(
     typer.echo(f"Computed {len(computed)} candidate features; stored {inserted} spikes.")
     if path is not None:
         typer.echo(f"Wrote {path}")
+
+
+@app.command()
+def label(
+    count: Annotated[int, typer.Option(help="Number of unlabeled spikes to review.")] = 20,
+    seed: Annotated[int, typer.Option(help="Sampling seed for a reproducible draw.")] = 0,
+    start: Annotated[str | None, typer.Option(help="First day, YYYY-MM-DD.")] = None,
+    end: Annotated[str | None, typer.Option(help="Last day, YYYY-MM-DD.")] = None,
+    labeler: Annotated[str | None, typer.Option(help="Name recorded with each label.")] = None,
+    file: Annotated[Path | None, typer.Option(help="Label CSV path.")] = None,
+) -> None:
+    """Review spikes in the terminal and append labels to labels.csv."""
+    _configure_logging()
+    settings = Settings()
+    path = file or settings.data_dir.parent / "labels" / "labels.csv"
+    existing = load_labels(path)
+    connection = db.connect(settings)
+    samples = sample_spikes(
+        connection,
+        count,
+        seed=seed,
+        start=_parse_day(start) if start else None,
+        end=_parse_day(end) if end else None,
+        exclude=existing,
+    )
+    if not samples:
+        typer.echo("No unlabeled spikes match. Run ingest, history and detect first.")
+        raise typer.Exit(code=1)
+    name = labeler or os.environ.get("USERNAME") or "unknown"
+    typer.echo(f"Reviewing {len(samples)} spikes as {name}. Labels append to {path}.")
+    try:
+        labeled, skipped = run_label_session(
+            connection,
+            samples,
+            path=path,
+            labeler=name,
+            ask=input,
+            echo=typer.echo,
+        )
+    except (EOFError, KeyboardInterrupt):
+        typer.echo("\nStopped. Labels written so far are kept.")
+        raise typer.Exit(code=0) from None
+    typer.echo(f"Labeled {labeled}; skipped {skipped}. Total labels: {len(load_labels(path))}.")
