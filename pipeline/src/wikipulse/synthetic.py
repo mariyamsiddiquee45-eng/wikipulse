@@ -85,6 +85,33 @@ def generate_synthetic(
     return SyntheticDataset(frame=frame, spikes=spikes)
 
 
+def synthetic_training_frame(dataset: SyntheticDataset) -> pd.DataFrame:
+    """Build a classifier frame from synthetic data using trailing 28-day baselines."""
+    ordered = dataset.frame.sort_values(["article", "day"]).copy()
+    grouped = ordered.groupby("article", sort=False)["views"]
+    baseline = grouped.transform(lambda values: values.shift(1).rolling(28, min_periods=7).median())
+    mad = grouped.transform(
+        lambda values: (
+            values.shift(1)
+            .rolling(28, min_periods=7)
+            .apply(lambda window: float(np.median(np.abs(window - np.median(window)))), raw=True)
+        )
+    )
+    sigma = (1.4826 * mad).where(lambda values: values > 0, 1.0)
+    week_baseline = grouped.transform(
+        lambda values: values.shift(1).rolling(7, min_periods=3).median()
+    )
+    ordered["baseline"] = baseline
+    ordered["z_score"] = (ordered["views"] - baseline) / sigma
+    ordered["peak_ratio"] = ordered["views"] / baseline.clip(lower=1)
+    ordered["week_ratio"] = ordered["views"] / week_baseline.clip(lower=1)
+    ordered["rank"] = ordered.groupby("day")["views"].rank(ascending=False, method="min")
+    ordered["label"] = np.where(ordered["true_spike"], "event", "noise")
+    ordered = ordered.dropna(subset=["baseline", "z_score"])
+    ordered["spike_id"] = ordered["article"] + "|" + ordered["day"].astype(str)
+    return ordered.reset_index(drop=True)
+
+
 def evaluate_detector(
     frame: pd.DataFrame,
     *,

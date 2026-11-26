@@ -81,6 +81,8 @@ CREATE TABLE IF NOT EXISTS spikes (
     score DOUBLE NOT NULL,
     spike_type VARCHAR NOT NULL,
     features VARCHAR NOT NULL,
+    class_probability DOUBLE,
+    predicted_class VARCHAR,
     created_at TIMESTAMP NOT NULL
 );
 CREATE TABLE IF NOT EXISTS events (
@@ -122,6 +124,8 @@ def init_schema(connection: duckdb.DuckDBPyConnection) -> None:
     connection.execute(_SCHEMA)
     connection.execute("ALTER TABLE spikes ADD COLUMN IF NOT EXISTS stl_residual DOUBLE")
     connection.execute("ALTER TABLE spikes ADD COLUMN IF NOT EXISTS time_to_peak_days DOUBLE")
+    connection.execute("ALTER TABLE spikes ADD COLUMN IF NOT EXISTS class_probability DOUBLE")
+    connection.execute("ALTER TABLE spikes ADD COLUMN IF NOT EXISTS predicted_class VARCHAR")
 
 
 def upsert_top(

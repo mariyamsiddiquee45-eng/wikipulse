@@ -5,6 +5,8 @@ description = "Daily spikes on English Wikipedia, grouped into events."
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "duckdb>=1.1",
+  "joblib>=1.4",
+  "lightgbm>=4.5",
   "numpy>=2.0",
   "pandas>=2.2",
   "pandera>=0.21",
@@ -12,6 +14,7 @@ dependencies = [
   "pydantic-settings>=2.6",
   "pyarrow>=18.0",
   "requests>=2.32",
+  "scikit-learn>=1.5",
   "statsmodels>=0.14",
   "typer>=0.15",
 ]
@@ -61,5 +64,5 @@ testpaths = ["tests"]
 markers = ["slow: long-running performance and volume tests"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*"]
+module = ["statsmodels.*", "joblib.*", "sklearn.*", "lightgbm.*"]
 ignore_missing_imports = true

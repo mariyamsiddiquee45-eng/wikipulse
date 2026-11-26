@@ -225,6 +225,12 @@ def compute_features(
 
     last_spike = db.last_spike_day(connection, candidate.article, candidate.day)
     days_since = (candidate.day - last_spike).days if last_spike is not None else None
+    week_values = [
+        value
+        for day, value in zip(days, views, strict=True)
+        if candidate.day - timedelta(days=7) <= day < candidate.day
+    ]
+    week_ratio = views[-1] / statistics.median(week_values) if week_values else None
     edit_row = connection.execute(
         "SELECT 1 FROM edits WHERE day = ? AND article = ?",
         [candidate.day, candidate.article],
@@ -252,6 +258,8 @@ def compute_features(
         "half_life_days": half_life,
         "peak_ratio": round(peak_ratio, 6),
         "rank_jump": rank_jump,
+        "rank": candidate.rank,
+        "week_ratio": round(week_ratio, 6) if week_ratio is not None else None,
         "days_since_last_spike": days_since,
         "edit_surge": edit_surge,
         "minimum_views_flag": int(views[-1]) < settings.minimum_views,

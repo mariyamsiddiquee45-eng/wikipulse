@@ -10,6 +10,7 @@ import typer
 
 from wikipulse import __version__, db
 from wikipulse.candidates import select_candidates
+from wikipulse.classifier import ClassifierError, classify_spikes, train_classifier
 from wikipulse.client import WikimediaClient
 from wikipulse.config import Settings
 from wikipulse.features import FeatureSet, collect_features, detect_range, features_frame
@@ -234,3 +235,49 @@ def label(
         typer.echo("\nStopped. Labels written so far are kept.")
         raise typer.Exit(code=0) from None
     typer.echo(f"Labeled {labeled}; skipped {skipped}. Total labels: {len(load_labels(path))}.")
+
+
+@app.command()
+def train(
+    model: Annotated[str, typer.Option(help="logistic, lightgbm or both.")] = "both",
+    file: Annotated[Path | None, typer.Option(help="Label CSV path.")] = None,
+    folds: Annotated[int, typer.Option(help="Expanding-window validation folds.")] = 4,
+) -> None:
+    """Train the classifier, compare baselines and write the evaluation report."""
+    _configure_logging()
+    settings = Settings()
+    path = file or settings.data_dir.parent / "labels" / "labels.csv"
+    kinds = ("logistic", "lightgbm") if model == "both" else (model,)
+    if any(kind not in {"logistic", "lightgbm"} for kind in kinds):
+        raise typer.BadParameter("--model must be logistic, lightgbm or both")
+    connection = db.connect(settings)
+    try:
+        report = train_classifier(connection, settings, path, kinds, folds)
+    except ClassifierError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(
+        f"Trained {report.model_name} on {report.labels} labels; "
+        f"event F1 {report.metrics['event_f1']:.3f}."
+    )
+    typer.echo(f"Model {report.model_path}")
+    typer.echo(f"Report {report.report_path}")
+
+
+@app.command()
+def classify(
+    start: Annotated[str | None, typer.Option(help="First day, YYYY-MM-DD.")] = None,
+    end: Annotated[str | None, typer.Option(help="Last day, YYYY-MM-DD.")] = None,
+    days: Annotated[int, typer.Option(help="Number of days ending at the last complete day.")] = 7,
+) -> None:
+    """Score stored spikes with the trained classifier."""
+    _configure_logging()
+    settings = Settings()
+    begin, finish = _date_range(start, end, days)
+    connection = db.connect(settings)
+    try:
+        scored = classify_spikes(connection, settings, begin, finish)
+    except ClassifierError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Scored {scored} spikes.")
