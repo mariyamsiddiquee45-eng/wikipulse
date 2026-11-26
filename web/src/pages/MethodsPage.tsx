@@ -28,6 +28,11 @@ export function MethodsPage() {
   }
   const data = methods.data
   const baselines = baselineRows(data.classifier?.baselines)
+  const ruleBaseline = baselines.find(([name]) => name === 'A_rule')?.[1]
+  const classifierWeaker =
+    data.classifier !== null &&
+    ruleBaseline !== undefined &&
+    data.classifier.event_f1 < ruleBaseline.f1
 
   return (
     <article className="prose stack">
@@ -63,6 +68,12 @@ export function MethodsPage() {
               <strong>{data.classifier.labels}</strong> human labels. Evaluation uses
               expanding-window time-series validation, never random splits.
             </p>
+            {classifierWeaker ? (
+              <div className="notice">
+                This classifier does not beat the rule baseline. It is not used to score events yet;
+                the rule score remains. More non-event labels are needed.
+              </div>
+            ) : null}
             <div className="table-wrap">
               <table>
                 <thead>
