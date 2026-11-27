@@ -335,6 +335,19 @@ a:visited {
   align-items: start;
 }
 
+.event-enter {
+  animation: event-enter 0.22s ease both;
+}
+
+@keyframes event-enter {
+  from {
+    transform: translateY(4px);
+  }
+  to {
+    transform: none;
+  }
+}
+
 .event-item:last-child {
   border-bottom: 0;
 }
@@ -445,11 +458,20 @@ a:visited {
   display: block;
 }
 
+.bubble-placeholder {
+  min-height: 280px;
+  border-radius: var(--radius);
+}
+
 .bubble {
   cursor: pointer;
   opacity: 0.9;
   stroke: var(--wp-surface);
   stroke-width: 2;
+}
+
+.bubble-group {
+  cursor: pointer;
 }
 
 .bubble:hover,

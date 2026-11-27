@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { Link, useParams } from 'react-router-dom'
 import { EmptyState, ErrorState, LoadingBlock } from '../components/States'
 import { typeClass } from '../components/typeClass'
@@ -9,6 +10,7 @@ const ID_PATTERN = /^(\d{4})(\d{2})(\d{2})-/
 
 export function EventPage() {
   const { id = '' } = useParams()
+  const reduceMotion = useReducedMotion()
   const match = ID_PATTERN.exec(id)
   const day = match ? `${match[1]}-${match[2]}-${match[3]}` : 'invalid'
   const resource = useDay(day)
@@ -88,8 +90,14 @@ export function EventPage() {
       <section className="card" aria-labelledby="members-heading">
         <h2 id="members-heading">Articles in this event</h2>
         <ul className="member-list">
-          {event.members.map((member) => (
-            <li className="member" key={member.slug}>
+          {event.members.map((member, index) => (
+            <motion.li
+              className="member"
+              key={member.slug}
+              initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: reduceMotion ? 0 : index * 0.03, duration: 0.2 }}
+            >
               <div>
                 <div className="member-title">
                   <Link to={articlePath(member.slug)}>{member.title}</Link>
@@ -114,7 +122,7 @@ export function EventPage() {
               <Link className="button" to={articlePath(member.slug)}>
                 View history
               </Link>
-            </li>
+            </motion.li>
           ))}
         </ul>
       </section>

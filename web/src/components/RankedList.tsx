@@ -1,11 +1,9 @@
-import { motion, useReducedMotion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import type { Event } from '../data/types'
 import { eventPath, formatNumber } from '../lib/format'
 import { typeClass } from './typeClass'
 
 export function RankedList({ events, limit }: { events: Event[]; limit?: number }) {
-  const reduceMotion = useReducedMotion()
   const visible = limit ? events.slice(0, limit) : events
   const maximum = Math.max(1, ...visible.map((event) => event.score))
 
@@ -15,13 +13,7 @@ export function RankedList({ events, limit }: { events: Event[]; limit?: number 
         const members = event.members.map((member) => member.title)
         const extra = members.length - 3
         return (
-          <motion.li
-            key={event.id}
-            className="event-item"
-            initial={reduceMotion ? false : { y: 6 }}
-            animate={{ y: 0 }}
-            transition={{ delay: reduceMotion ? 0 : Math.min(index * 0.02, 0.3) }}
-          >
+          <li key={event.id} className="event-item event-enter">
             <span className="event-rank" aria-hidden="true">
               {index + 1}
             </span>
@@ -47,7 +39,7 @@ export function RankedList({ events, limit }: { events: Event[]; limit?: number 
                 {Math.round(event.score)}
               </progress>
             </div>
-          </motion.li>
+          </li>
         )
       })}
     </ol>
