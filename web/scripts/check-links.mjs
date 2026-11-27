@@ -28,12 +28,7 @@ for (const day of manifest.days) {
   const document = JSON.parse(readFileSync(dayPath, 'utf8'))
   for (const event of document.events) {
     for (const member of event.members) {
-      const articlePath = join(
-        exportDir,
-        'articles',
-        member.slug.slice(0, 2),
-        `${member.slug}.json`,
-      )
+      const articlePath = join(dataDir, 'articles', member.slug.slice(0, 2), `${member.slug}.json`)
       articleFiles.add(articlePath)
       if (!existsSync(articlePath)) {
         failures.push(`${day} event ${event.id} points at missing article ${member.slug}`)
