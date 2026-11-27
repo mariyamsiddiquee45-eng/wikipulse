@@ -3,7 +3,7 @@ import { join, resolve } from 'node:path'
 
 const exportDir = resolve(import.meta.dirname, '../../data/export')
 const publicDir = resolve(import.meta.dirname, '../public/data')
-const dataDir = existsSync(exportDir) ? exportDir : publicDir
+const dataDir = existsSync(join(publicDir, 'manifest.json')) ? publicDir : exportDir
 const manifestPath = join(dataDir, 'manifest.json')
 if (!existsSync(manifestPath)) {
   console.warn('No export data; run wikipulse export first.')
